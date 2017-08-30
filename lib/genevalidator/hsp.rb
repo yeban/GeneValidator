@@ -53,6 +53,11 @@ module GeneValidator
     def assert_seq_type(query)
       seq_type = BlastUtils.guess_sequence_type(query)
       fail SequenceTypeError if seq_type != :protein
+    rescue SequenceTypeError => e
+      $stderr.puts e
+      $stderr.puts 'Rescuing SequenceTypeError (HSP): Ignoring the fact' \
+                   " that following sequence was suppsoed to be a protein: " \
+                   "\n #{query}"
     end
   end
 end

@@ -143,7 +143,10 @@ module GeneValidator
         hits
       rescue SequenceTypeError => e
         $stderr.puts e
-        exit 1
+        $stderr.puts 'Rescuing SequenceTypeError (Blast): Ignoring the fact' \
+                     " that one of BLAST hit_alignment or query_alignment" \
+                     " was supposed to be a protein sequence."
+        # exit 1
       rescue StopIteration
         nil
       end
