@@ -122,11 +122,27 @@ module GeneValidator
 
             current_hsp.hit_alignment = hsp.hseq.to_s
             seq_type = guess_sequence_type(current_hsp.hit_alignment)
-            fail SequenceTypeError unless seq_type == :protein || seq_type.nil?
+            begin
+              fail SequenceTypeError unless seq_type == :protein || seq_type.nil?
+            rescue SequenceTypeError => e
+              $stderr.puts e
+              $stderr.puts 'Rescuing SequenceTypeError (Blast): Ignoring the fact' \
+                           " that one of BLAST hit_alignment was supposed" \
+                           " to be a protein sequence: #{current_hsp.hit_alignment}"
+              # exit 1
+            end
 
             current_hsp.query_alignment = hsp.qseq.to_s
             seq_type = guess_sequence_type(current_hsp.query_alignment)
-            fail SequenceTypeError unless seq_type == :protein || seq_type.nil?
+            begin
+              fail SequenceTypeError unless seq_type == :protein || seq_type.nil?
+            rescue SequenceTypeError => e
+              $stderr.puts e
+              $stderr.puts 'Rescuing SequenceTypeError (Blast): Ignoring the fact' \
+                           " that one of BLAST query_alignment was supposed to" \
+                           " be a protein sequence: #{current_hsp.query_alignment}"
+              # exit 1
+            end
 
             current_hsp.align_len = hsp.align_len.to_i
             current_hsp.identity  = hsp.identity.to_i
@@ -141,12 +157,12 @@ module GeneValidator
         end
 
         hits
-      rescue SequenceTypeError => e
-        $stderr.puts e
-        $stderr.puts 'Rescuing SequenceTypeError (Blast): Ignoring the fact' \
-                     " that one of BLAST hit_alignment or query_alignment" \
-                     " was supposed to be a protein sequence."
-        # exit 1
+      # rescue SequenceTypeError => e
+      #   $stderr.puts e
+      #   $stderr.puts 'Rescuing SequenceTypeError (Blast): Ignoring the fact' \
+      #                " that one of BLAST hit_alignment or query_alignment" \
+      #                " was supposed to be a protein sequence."
+      #   # exit 1
       rescue StopIteration
         nil
       end
